@@ -1,26 +1,27 @@
 import { ProjectData } from "../types";
 
-const apiKey =
-  import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  console.error(
-    "VITE_GEMINI_API_KEY is not set. Please add your Gemini API key to .env file"
+const getApiKey = (): string | null => {
+  return (
+    import.meta.env.VITE_GEMINI_API_KEY ||
+    import.meta.env.GEMINI_API_KEY ||
+    null
   );
-  throw new Error(
-    "Gemini API key is required. Please set VITE_GEMINI_API_KEY in your .env file"
-  );
-}
+};
 
 // Validate API key format (Gemini API keys usually start with AIza)
-if (apiKey && !apiKey.startsWith("AIza") && apiKey !== "your_api_key_here") {
-  console.warn(
-    "API key format may be incorrect. Gemini API keys typically start with 'AIza'"
-  );
-}
+const validateApiKey = (key: string | null): boolean => {
+  if (!key) return false;
+  if (key === "your_api_key_here") return false;
+  if (!key.startsWith("AIza")) {
+    console.warn(
+      "API key format may be incorrect. Gemini API keys typically start with 'AIza'"
+    );
+  }
+  return true;
+};
 
 // Helper function to get available models
-const getAvailableModels = async (): Promise<string[]> => {
+const getAvailableModels = async (apiKey: string): Promise<string[]> => {
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
@@ -55,8 +56,18 @@ export const parseFileWithGemini = async (
   mimeType: string,
   fileName: string
 ): Promise<ProjectData> => {
+  // Get API key
+  const apiKey = getApiKey();
+
+  if (!apiKey || !validateApiKey(apiKey)) {
+    throw new Error(
+      "Gemini API key is required. Please set VITE_GEMINI_API_KEY in your environment variables. " +
+        "For Vercel: Go to Project Settings > Environment Variables and add VITE_GEMINI_API_KEY"
+    );
+  }
+
   // Get available models first
-  const availableModels = await getAvailableModels();
+  const availableModels = await getAvailableModels(apiKey);
 
   // Fallback models if listing fails
   const fallbackModels = [
