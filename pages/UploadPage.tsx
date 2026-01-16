@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { parseFileWithGemini } from "../services/geminiService";
+import { saveProjectToHistory } from "../services/historyService";
 import {
   Upload,
   FileText,
@@ -16,6 +17,7 @@ import {
   LayoutDashboard,
   FileDown,
   Info,
+  History as HistoryIcon,
 } from "lucide-react";
 
 const AIButtonLoader = () => (
@@ -109,7 +111,13 @@ const UploadPage: React.FC = () => {
         file.type,
         file.name
       );
+
+      // Save to current project_data
       localStorage.setItem("project_data", JSON.stringify(parsedData));
+
+      // Save to history
+      saveProjectToHistory(parsedData);
+
       navigate("/project");
     } catch (err: any) {
       setError(
@@ -263,18 +271,18 @@ const UploadPage: React.FC = () => {
         </div>
       )}
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-12 pb-20 flex-1 flex flex-col items-center">
-        <nav className="w-full flex justify-between items-center mb-16 md:mb-24 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="flex items-center space-x-2.5 group cursor-default">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-300">
-              <Zap className="w-6 h-6 fill-current" />
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-12 sm:pb-20 flex-1 flex flex-col items-center w-full">
+        <nav className="w-full flex justify-between items-center mb-8 sm:mb-12 md:mb-16 lg:mb-24 animate-in fade-in slide-in-from-top-4 duration-700 px-2 sm:px-0">
+          <div className="flex items-center space-x-2 sm:space-x-2.5 group cursor-default">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-300">
+              <Zap className="w-4 h-4 sm:w-6 sm:h-6 fill-current" />
             </div>
-            <span className="text-lg md:text-xl font-extrabold tracking-tight text-slate-900">
+            <span className="text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-slate-900">
               ScopeLens
             </span>
           </div>
 
-          <div className="flex items-center space-x-4 md:space-x-8 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-8 text-[9px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-slate-400">
             <button
               onClick={() => setShowHowItWorks(true)}
               className="hover:text-indigo-600 transition-colors uppercase flex items-center"
@@ -284,28 +292,37 @@ const UploadPage: React.FC = () => {
                 <Info className="w-3.5 h-3.5 mr-1.5" /> Info
               </span>
             </button>
+            <button
+              onClick={() => navigate("/history")}
+              className="hover:text-indigo-600 transition-colors uppercase flex items-center"
+            >
+              <span className="hidden sm:inline">History</span>
+              <span className="sm:hidden flex items-center bg-slate-100 px-3 py-1.5 rounded-full text-slate-600">
+                <HistoryIcon className="w-3.5 h-3.5 mr-1.5" /> History
+              </span>
+            </button>
           </div>
         </nav>
 
-        <div className="text-center max-w-4xl mb-12 md:mb-16 space-y-6">
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] animate-in fade-in zoom-in-95 duration-700 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="text-center max-w-4xl mb-8 sm:mb-12 md:mb-16 space-y-4 sm:space-y-6 w-full px-4 sm:px-0">
+          <div className="inline-flex items-center space-x-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-white/80 backdrop-blur-sm border border-indigo-100 text-indigo-600 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] animate-in fade-in zoom-in-95 duration-700 shadow-sm">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>Next-Gen Analysis Studio</span>
           </div>
-          <h1 className="text-4xl md:text-8xl font-black text-slate-900 leading-[1.1] md:leading-[0.95] tracking-tight animate-in slide-in-from-bottom-8 duration-700 delay-100">
-            Analyze Project Docs <br />
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-black text-slate-900 leading-[1.15] sm:leading-[1.1] md:leading-[0.95] tracking-tight animate-in slide-in-from-bottom-8 duration-700 delay-100 px-2 sm:px-0">
+            Analyze Project Docs <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-sky-500 bg-clip-text text-transparent italic">
               in Seconds.
             </span>
           </h1>
-          <p className="text-base md:text-xl text-slate-500 font-medium max-w-2xl mx-auto animate-in fade-in duration-1000 delay-300">
-            Elevate your workflow. Instantly transform complex Excel or PDF
-            scope documents into interactive, beautiful breakdowns.
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-500 font-medium max-w-2xl mx-auto animate-in fade-in duration-1000 delay-300 px-4 sm:px-0">
+            Elevate your workflow. Instantly transform complex PDF scope
+            documents into interactive, beautiful breakdowns.
           </p>
         </div>
 
-        <div className="w-full max-w-2xl animate-in slide-in-from-bottom-12 duration-1000 delay-500">
-          <div className="bg-white/70 backdrop-blur-2xl border border-white/90 shadow-[0_32px_64px_-16px_rgba(79,70,229,0.12)] rounded-[2.5rem] md:rounded-[3rem] p-4 md:p-10 flex flex-col relative overflow-hidden group">
+        <div className="w-full max-w-2xl animate-in slide-in-from-bottom-12 duration-1000 delay-500 px-4 sm:px-0">
+          <div className="bg-white/70 backdrop-blur-2xl border border-white/90 shadow-[0_32px_64px_-16px_rgba(79,70,229,0.12)] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] lg:rounded-[3rem] p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col relative overflow-hidden group w-full">
             {isLoading && (
               <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-[2.5rem] md:rounded-[3rem]">
                 <div className="absolute inset-x-0 h-40 bg-gradient-to-b from-indigo-500/10 to-transparent top-0 animate-[scan_2s_linear_infinite] blur-xl opacity-30"></div>
@@ -316,7 +333,7 @@ const UploadPage: React.FC = () => {
             <div
               onClick={() => !isLoading && fileInputRef.current?.click()}
               className={`
-                relative border-2 border-dashed rounded-[2rem] p-8 md:p-12 text-center transition-all duration-500 cursor-pointer
+                relative border-2 border-dashed rounded-[1.5rem] sm:rounded-[1.75rem] md:rounded-[2rem] p-6 sm:p-8 md:p-10 lg:p-12 text-center transition-all duration-500 cursor-pointer w-full
                 ${
                   file
                     ? "border-indigo-400 bg-white/95 shadow-inner"
@@ -335,15 +352,15 @@ const UploadPage: React.FC = () => {
               />
 
               {!file ? (
-                <div className="space-y-6">
-                  <div className="mx-auto w-20 h-20 md:w-24 md:h-24 bg-white shadow-[0_12px_24px_rgba(79,70,229,0.08)] rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
-                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-indigo-600" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white shadow-[0_12px_24px_rgba(79,70,229,0.08)] rounded-[1.25rem] sm:rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <Upload className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                    <p className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight">
                       Drop project file here
                     </p>
-                    <p className="text-slate-400 font-semibold mt-1 text-sm">
+                    <p className="text-slate-400 font-semibold mt-1 text-xs sm:text-sm">
                       Accepts high-res PDF or Excel sheets
                     </p>
                   </div>
@@ -384,9 +401,9 @@ const UploadPage: React.FC = () => {
               </div>
             )}
 
-            <div className="mt-10 relative">
+            <div className="mt-6 sm:mt-8 md:mt-10 relative w-full">
               <Button
-                className={`w-full py-6 text-lg md:text-xl tracking-tight shadow-[0_20px_40px_-10px_rgba(79,70,229,0.35)] transition-all duration-500 rounded-2xl ${
+                className={`w-full py-4 sm:py-5 md:py-6 text-base sm:text-lg md:text-xl tracking-tight shadow-[0_20px_40px_-10px_rgba(79,70,229,0.35)] transition-all duration-500 rounded-xl sm:rounded-2xl ${
                   isLoading
                     ? "bg-slate-900 overflow-hidden scale-[0.98]"
                     : "hover:scale-[1.02]"
@@ -399,7 +416,7 @@ const UploadPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-16 flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-50">
+          <div className="mt-8 sm:mt-12 md:mt-16 flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 opacity-50 px-4 sm:px-0">
             <div className="flex items-center space-x-2.5 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-slate-900">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>High-Level Security</span>

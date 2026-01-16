@@ -85,14 +85,21 @@ export const parseFileWithGemini = async (
 Return a JSON object strictly following this schema:
 - milestones: array of objects with { milestone: string, title: string, scope: string, tasks: array of strings, exclusions: array of strings, estimatedHours: number, priceEstimate: number }
 - totalBallpark: (optional) object with { hours: number, price: number }
+- columnHeaders: (optional) array of strings representing the detected column headers from the milestone table (e.g., ["Milestone", "Title", "Scope", "Tasks", "Hours", "Price"])
 
 Guidelines for Extraction:
-1. 'milestone': Extract the exact text from the FIRST column of the milestone table (usually IDs like "Milestone 1", "M1", etc).
-2. 'title': Extract the exact text from the SECOND column of the milestone table (the descriptive name/title of that phase).
+1. 'milestone': ALWAYS extract the exact text from the FIRST column of the milestone table (usually IDs like "Milestone 1", "M1", etc). This is mandatory for all rows.
+2. 'title': Extract the exact text from the SECOND column ONLY if:
+   - The second column header is "Title" or contains "Title" (case-insensitive, e.g., "Title", "title", "TITEL", "Project Title", "Milestone Title", etc.)
+   - AND the cell has actual data (not empty/null)
+   - If the second column header is NOT "Title" or the cell is empty, set 'title' to an empty string ""
 3. 'scope': Detailed description text for the work phase.
 4. 'tasks': Specific itemized tasks.
 5. 'exclusions': Items explicitly listed as out of scope.
-6. 'estimatedHours' & 'priceEstimate': Numerical values only.`;
+6. 'estimatedHours' & 'priceEstimate': Numerical values only.
+7. 'columnHeaders': (optional) Extract the actual column headers from the milestone table as an array of strings. The first element should be the header of the first column (e.g., "Milestone", "Phase", "M1", etc.).
+
+Important: Always extract 'milestone' from column 1. Only extract 'title' from column 2 if the column header indicates it's a title column and the cell has data. Include 'columnHeaders' array if you can identify the table headers.`;
 
   let lastError: any = null;
 
@@ -156,6 +163,10 @@ Guidelines for Extraction:
                   price: { type: "NUMBER" },
                 },
               },
+              columnHeaders: {
+                type: "ARRAY",
+                items: { type: "STRING" },
+              },
             },
             required: ["milestones"],
           },
@@ -188,6 +199,7 @@ Guidelines for Extraction:
           id: `m-${idx}`,
         })),
         totalBallpark: parsedJson.totalBallpark,
+        columnHeaders: parsedJson.columnHeaders || [],
       };
     } catch (error: any) {
       console.warn(`Model ${model} failed:`, error.message);

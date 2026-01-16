@@ -9,7 +9,7 @@
 // ============================================
 // Comment out the line below to DISABLE DevTools protection (for testing)
 // Uncomment it to ENABLE DevTools protection (for production)
-const ENABLE_DEVTOOLS_PROTECTION = true; // 👈 COMMENT THIS LINE TO DISABLE PROTECTION
+const ENABLE_DEVTOOLS_PROTECTION = false; // 👈 COMMENT THIS LINE TO DISABLE PROTECTION
 // ============================================
 
 // If protection is disabled, exit early

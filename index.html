@@ -3,7 +3,7 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     
     <!-- Primary Meta Tags -->
     <title>ScopeLens - Advanced Documentation Studio</title>
@@ -181,6 +181,27 @@
         -moz-user-drag: none;
         -o-user-drag: none;
         pointer-events: none;
+      }
+      
+      /* Mobile responsiveness fixes */
+      html, body {
+        width: 100%;
+        overflow-x: hidden;
+        position: relative;
+      }
+      
+      /* Prevent horizontal scroll on mobile */
+      * {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      
+      /* Ensure proper touch scrolling on mobile */
+      @media (max-width: 768px) {
+        body {
+          -webkit-overflow-scrolling: touch;
+          overflow-x: hidden;
+        }
       }
     </style>
   <script type="importmap">
