@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { parseFileWithGemini } from "../services/geminiService";
@@ -36,6 +36,37 @@ const UploadPage: React.FC = () => {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  // Prevent forward navigation from upload page
+  useEffect(() => {
+    // Replace current history entry to prevent forward navigation
+    // This ensures there's no forward history from the upload page
+    if (window.history.state === null) {
+      window.history.replaceState({ page: "upload" }, "", window.location.href);
+    }
+
+    // Clear forward history by replacing current entry
+    const clearForwardHistory = () => {
+      window.history.replaceState({ page: "upload" }, "", window.location.href);
+    };
+
+    // Clear forward history on mount
+    clearForwardHistory();
+
+    // Also clear on any navigation attempt
+    const handlePopState = () => {
+      // If somehow we're not on the upload page, go back to it
+      if (window.location.hash !== "#/" && window.location.hash !== "") {
+        window.history.replaceState({ page: "upload" }, "", "#/");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
